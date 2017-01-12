@@ -8,3 +8,8 @@ Adafruit_DCMotor* leftFrontMotor = AFMS.getMotor(LEFT_FRONT_MOTOR);
 Adafruit_DCMotor* rightFrontMotor = AFMS.getMotor(RIGHT_FRONT_MOTOR);
 Adafruit_DCMotor* leftBackMotor = AFMS.getMotor(LEFT_BACK_MOTOR);
 Adafruit_DCMotor* rightBackMotor = AFMS.getMotor(RIGHT_BACK_MOTOR);
+
+
+int moveForward(int speed){
+	RIGHT_FRONT_MOTOR
+}
