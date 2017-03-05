@@ -7,6 +7,8 @@ class Sensor
 public:
   float curVal;
   float prevVal;
+  long prevTime;
+  long curTime;
   float update(float value);
 };
 

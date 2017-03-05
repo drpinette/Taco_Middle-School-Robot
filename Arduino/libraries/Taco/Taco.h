@@ -11,7 +11,7 @@
 //#undef DEBUG
 
 enum Rotation { None = 0, CW  = 1 /*Clockwise*/, CCW = -1 /*Counterclockwise*/ };
-enum Heading { None = 0, North = 1, East = 2, South = 3, West = 4 };
+enum Heading { North = 0, East = 1, South = 2, West = 3 };
 enum Side { None = 0, Right = 1, Left = -1 };
 
 #ifdef DEBUG
@@ -74,6 +74,7 @@ enum Side { None = 0, Right = 1, Left = -1 };
 #define DEFAULT_SPEED (MAX_SPEED/2)
 
 #define ABS(x) ((x)<0 ? -(x) : (x))
+#define SGN(x) ((x)<0 ? -1 : ((x)>0 ? x : 0))
 
 class RobotController
 {
@@ -83,7 +84,7 @@ public:
   void stop();
   int readUv(int sensor);
   float readDistanceSonar(int sensor);
-  void followWall(Direction wallSide, Direction heading, int speed=DEFAULT_SPEED);
+  void followWall(Side wallSide, Heading heading, int speed=DEFAULT_SPEED);
 
 private:
   Sensor sonar[NUM_SONAR];

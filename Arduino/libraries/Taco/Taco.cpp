@@ -82,7 +82,7 @@ float RobotController::readDistanceSonar(int sensorId)
   return distance;
 }
 
-void RobotController::followWall(Heading wallSide, Heading heading, int speed)
+void RobotController::followWall(Side wallSide, Heading heading, int speed)
 {
   // TODO Implement
 }
