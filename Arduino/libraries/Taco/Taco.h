@@ -1,5 +1,5 @@
-#ifndef PREPARATION_H
-#define PREPARATION_H
+#ifndef TACO_H
+#define TACO_H
 /////////////////////////////////////////////////////////////////////////////
 #include <Arduino.h>
 #include <Adafruit_MotorShield.h>
@@ -10,9 +10,9 @@
 //#define DEBUG
 //#undef DEBUG
 
-enum Rotation { None = 0, CW  = 1 /*Clockwise*/, CCW = -1 /*Counterclockwise*/ };
+enum Rotation { NoRotation = 0, CW  = 1 /*Clockwise*/, CCW = -1 /*Counterclockwise*/ };
 enum Heading { North = 0, East = 1, South = 2, West = 3 };
-enum Side { None = 0, Right = 1, Left = -1 };
+enum Side { NoSide = 0, Right = 1, Left = -1 };
 
 #ifdef DEBUG
 #define _D(X) Serial.print(#X " "), Serial.print(X), Serial.print("; ") 
@@ -25,10 +25,10 @@ enum Side { None = 0, Right = 1, Left = -1 };
 #endif
 
 // Digital I/O pin assignments
-#define UNAVAILABLE 0
-#define UNAVAILABLE 1
-#define UNAVAILABLE 2
-#define UNAVAILABLE 3
+#define AVAILABLE0 0
+#define AVAILABLE1 1
+#define AVAILABLE2 2
+#define AVAILABLE3 3
 #define NORTH_CCW_SONAR 4
 #define NORTH_CW_SONAR 5
 #define EAST_CCW_SONAR 6
@@ -83,7 +83,7 @@ public:
   void go(Heading  heading, int speed, Side sideDirection, int sideSpeed, Rotation turnDirection, int turnSpeed); 
   void stop();
   int readUv(int sensor);
-  float readDistanceSonar(int sensor);
+  float readDistanceSonar(int sensorId);
   void followWall(Side wallSide, Heading heading, int speed=DEFAULT_SPEED);
 
 private:

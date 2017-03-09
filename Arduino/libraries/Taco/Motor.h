@@ -9,7 +9,8 @@ public:
   Adafruit_DCMotor* motor;
   int speed;
   int direction;
-  public void run(int direction, int speed);
+  void run(int direction, int speed);
+  Motor();
 };
 
 //////////////////////////////////////////////////////////////////////////////

@@ -1,8 +1,9 @@
-#include <TaconH.h>
+#include <Taco.h>
 
 void RobotController::initialize()
 {
   motorController = Adafruit_MotorShield(MOTOR_CONTROLLER_ADDR);
+  for (int i = 0; i < NUM_MOTOR; i++) motor[i].motor = motorController.getMotor(i+1);
   motorController.begin();
 
   Wire.begin();  // Set up Arduino as I2C master
@@ -10,7 +11,7 @@ void RobotController::initialize()
   for (int i = 0; i < NUM_MOTOR; i++) motor[i].run(RELEASE, 0);
 }
 
-void RobotController::go(Direction  heading, int speed, Side sideDirection, int sideSpeed, Rotation turnDirection, int turnSpeed) 
+void RobotController::go(Heading  heading, int speed, Side sideDirection, int sideSpeed, Rotation turnDirection, int turnSpeed) 
 {
   // The robot is always going "forward" (in the heading direction).  Compute speeds in a generic 
   // forward direction, then assign speeds to the actual motor controllers for the given heading.
@@ -22,21 +23,21 @@ void RobotController::go(Direction  heading, int speed, Side sideDirection, int 
   int directionRightFront = speedRightFront < 0 ? BACKWARD : FORWARD;
   int directionLeftBack = speedLeftBack < 0 ? BACKWARD : FORWARD;
   int directionRightBack = speedRightBack < 0 ? BACKWARD : FORWARD;
-  int speedLeftFront = ABS(speedLeftFront);
-  int speedRightFront = ABS(speedRightFront);
-  int speedLeftBack = ABS(speedLeftBack);  
-  int speedRightBack = ABS(speedRightBack);
+ speedLeftFront = ABS(speedLeftFront);
+ speedRightFront = ABS(speedRightFront);
+ speedLeftBack = ABS(speedLeftBack);  
+ speedRightBack = ABS(speedRightBack);
 
   // Now assign speeds to motor controllers
-  int motorControllerOffset = ((int)heading) - ((int)Heading.North);
+  int motorControllerOffset = ((int)heading) - ((int)(Heading::North));
   Motor motorLeftFront = motor[motorControllerOffset];
   Motor motorRightFront = motor[(motorControllerOffset+1) % 4];
   Motor motorLeftBack = motor[(motorControllerOffset+2) % 4];
   Motor motorRightBack = motor[(motorControllerOffset+3) % 4];
   motorLeftFront.run(directionLeftFront, speedLeftFront);
-  motorRightFront.run(directionRightFront, speedRithFront);
-  motorLeftBack.run(directionLeftBack, speedLeftBack);
-  motorRightBack.run(directionRightBack, speedRightBack);
+  //motorRightFront.run(directionRightFront, speedRightFront);
+  //motorLeftBack.run(directionLeftBack, speedLeftBack);
+  //motorRightBack.run(directionRightBack, speedRightBack);
 }
 
 void RobotController::stop()
@@ -55,18 +56,18 @@ float RobotController::readDistanceSonar(int sensorId)
 {
   // The PING))) is triggered by a HIGH pulse of 2 or more microseconds.
   // Give a short LOW pulse beforehand to ensure a clean HIGH pulse:
-  pinMode(sensor, OUTPUT);
-  digitalWrite(sensor, LOW);
+  pinMode(sensorId, OUTPUT);
+  digitalWrite(sensorId, LOW);
   delayMicroseconds(2);
-  digitalWrite(sensor, HIGH);
+  digitalWrite(sensorId, HIGH);
   delayMicroseconds(5);
-  digitalWrite(sensor, LOW);
+  digitalWrite(sensorId, LOW);
 
   // The same pin is used to read the signal from the PING))): a HIGH
   // pulse whose duration is the time (in microseconds) from the sending
   // of the ping to the reception of its echo off of an object.
-  pinMode(sensor, INPUT);
-  int duration = pulseIn(sensor, HIGH);
+  pinMode(sensorId, INPUT);
+  int duration = pulseIn(sensorId, HIGH);
 
   // Convert to inches
   // According to Parallax's datasheet for the PING))), there are
@@ -78,7 +79,7 @@ float RobotController::readDistanceSonar(int sensorId)
 
   int sensorIndex = sensorId - SONAR_ORIGIN;
   sonar[sensorIndex].prevVal = sonar[sensorIndex].curVal;
-  sonar[sensorIndex].curVal = val;
+  sonar[sensorIndex].curVal = distance;
   return distance;
 }
 

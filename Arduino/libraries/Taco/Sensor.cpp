@@ -11,4 +11,5 @@ float Sensor::update(float value)
   curTime = millis();
   prevVal = curVal;
   curVal = value;
+  return value;
 }

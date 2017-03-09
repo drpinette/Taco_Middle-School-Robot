@@ -1,4 +1,4 @@
-#include <PreparationH.h>
+#include <Taco.h>
 #include <Arduino.h>
 #include <Adafruit_MotorShield.h>
 #include <Wire.h>
@@ -11,7 +11,7 @@ void setup() {
 }
 
 void loop() {
-  RC->updateSensors();
+  RC->readDistanceSonar(sensorId);
   Serial.println(RC->sonarBL.curVal);
   delay(1000);
 }

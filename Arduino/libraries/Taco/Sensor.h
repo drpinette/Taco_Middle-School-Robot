@@ -9,6 +9,7 @@ public:
   float prevVal;
   long prevTime;
   long curTime;
+  Sensor();
   float update(float value);
 };
 
