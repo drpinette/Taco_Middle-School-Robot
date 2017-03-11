@@ -27,31 +27,31 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 // Digital I/O pin assignments
 #define AVAILABLE0 0
 #define AVAILABLE1 1
-#define AVAILABLE2 2
-#define AVAILABLE3 3
-#define NORTH_CCW_SONAR 4
-#define NORTH_CW_SONAR 5
-#define EAST_CCW_SONAR 6
-#define EAST_CW_SONAR 7
-#define SOUTH_CCW_SONAR 8
-#define SOUTH_CW_SONAR 9
-#define WEST_CCW_SONAR 10
-#define WEST_CW_SONAR 11
-#define EXTINGUISHER 12
+#define AVAILABLE2 12
+#define START 11
+#define NORTH_CCW_SONAR 2
+#define NORTH_CW_SONAR 3
+#define EAST_CCW_SONAR 4
+#define EAST_CW_SONAR 5
+#define SOUTH_CCW_SONAR 6
+#define SOUTH_CW_SONAR 7
+#define WEST_CCW_SONAR 8
+#define WEST_CW_SONAR 9
+#define EXTINGUISHER 10
 #define LED 13
 
 #define NUM_SONAR 8
-#define SONAR_ORIGIN 4
+#define SONAR_ORIGIN 2
 
 // Analog I/O pin assignments
-#define UV0 0
-#define UV1 1
-#define UV2 2
-#define UV3 3
-#define UV4 4
-#define UNASSIGNED 5
+#define NORTH_UV 0
+#define EAST_UV 1
+#define SOUTH_UV 2
+#define WEST_UV 3
+#define UNASSIGNED1 4
+#define UNASSIGNED2 5
 
-#define NUM_UV 5
+#define NUM_UV 4
 #define UV_ORIGIN 0
 
 // I2C address assignments
