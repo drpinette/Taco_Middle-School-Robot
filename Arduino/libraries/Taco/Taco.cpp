@@ -3,12 +3,12 @@
 void RobotController::initialize()
 {
   motorController = Adafruit_MotorShield(MOTOR_CONTROLLER_ADDR);
-  for (int i = 0; i < NUM_MOTOR; i++) motor[i].motor = motorController.getMotor(i+1);
+  for (int i = 0; i < NUM_MOTOR; i++) motorArray[i].motor = motorController.getMotor(i+1);
   motorController.begin();
 
   Wire.begin();  // Set up Arduino as I2C master
 
-  for (int i = 0; i < NUM_MOTOR; i++) motor[i].run(RELEASE, 0);
+  for (int i = 0; i < NUM_MOTOR; i++) motorArray[i].run(RELEASE, 0);
 }
 
 void RobotController::go(Heading  heading, int speed, Side sideDirection, int sideSpeed, Rotation turnDirection, int turnSpeed) 
@@ -23,6 +23,8 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
   int directionRightFront = speedRightFront < 0 ? BACKWARD : FORWARD;
   int directionLeftBack = speedLeftBack < 0 ? BACKWARD : FORWARD;
   int directionRightBack = speedRightBack < 0 ? BACKWARD : FORWARD;
+  _D(speedLeftFront);_D(speedRightFront);_D(speedRightBack);_D(speedLeftBack);_NL;
+  _D(directionLeftFront);_D(directionRightFront);_D(directionLeftBack);_D(directionRightBack);_NL;
  speedLeftFront = ABS(speedLeftFront);
  speedRightFront = ABS(speedRightFront);
  speedLeftBack = ABS(speedLeftBack);  
@@ -30,19 +32,22 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
 
   // Now assign speeds to motor controllers
   int motorControllerOffset = ((int)heading) - ((int)(Heading::North));
-  Motor motorLeftFront = motor[motorControllerOffset];
-  Motor motorRightFront = motor[(motorControllerOffset+1) % 4];
-  Motor motorLeftBack = motor[(motorControllerOffset+2) % 4];
-  Motor motorRightBack = motor[(motorControllerOffset+3) % 4];
+  Serial.println(motorControllerOffset);
+  Motor motorLeftFront = motorArray[motorControllerOffset+0];
+  Motor motorRightFront = motorArray[(motorControllerOffset+1) % 4];
+  Motor motorRightBack = motorArray[(motorControllerOffset+2) % 4];
+  Motor motorLeftBack = motorArray[(motorControllerOffset+3) % 4];
   motorLeftFront.run(directionLeftFront, speedLeftFront);
-  //motorRightFront.run(directionRightFront, speedRightFront);
-  //motorLeftBack.run(directionLeftBack, speedLeftBack);
-  //motorRightBack.run(directionRightBack, speedRightBack);
+  motorRightFront.run(directionRightFront, speedRightFront);
+  motorRightBack.run(directionRightBack, speedRightBack);
+  motorLeftBack.run(directionLeftBack, speedLeftBack);
+  _DS(motorArray[0].curSpeed);_DS(motorArray[1].curSpeed);_DS(motorArray[2].curSpeed);_DS(motorArray[3].curSpeed);_NL;
+  _DS(motorArray[0].curDirection);_DS(motorArray[1].curDirection);_DS(motorArray[2].curDirection);_DS(motorArray[3].curDirection);_NL;
 }
 
 void RobotController::stop()
 {
-  for (int i = 0; i < NUM_MOTOR; i++) motor[i].run(BRAKE, 0);
+  for (int i = 0; i < NUM_MOTOR; i++) motorArray[i].run(BRAKE, 0);
   delay(200); // Braking delay to give time to stop
 }
 

@@ -7,7 +7,7 @@
 #include <Sensor.h>
 #include <Motor.h>
 
-//#define DEBUG
+#define DEBUG
 //#undef DEBUG
 
 enum Rotation { NoRotation = 0, CW  = 1 /*Clockwise*/, CCW = -1 /*Counterclockwise*/ };
@@ -16,6 +16,7 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 
 #ifdef DEBUG
 #define _D(X) Serial.print(#X " "), Serial.print(X), Serial.print("; ") 
+#define _DS(X) Serial.print( " "), Serial.print(X), Serial.print("; ")
 #define _DC(X) Serial.print(#X "; ")
 #define _NL Serial.print("\n")
 #else
@@ -70,7 +71,7 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 #define NUM_MOTOR 4
 #define MOTOR_ORIGIN 1
 
-#define MAX_SPEED 1023
+#define MAX_SPEED 255
 #define DEFAULT_SPEED (MAX_SPEED/2)
 
 #define ABS(x) ((x)<0 ? -(x) : (x))
@@ -89,7 +90,7 @@ public:
 private:
   Sensor sonar[NUM_SONAR];
   Sensor uv[NUM_UV];
-  Motor motor[NUM_MOTOR];
+  Motor motorArray[NUM_MOTOR];
   Adafruit_MotorShield motorController;
 };
 
