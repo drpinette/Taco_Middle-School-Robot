@@ -72,10 +72,11 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 #define MOTOR_ORIGIN 1
 
 #define MAX_SPEED 255
-#define DEFAULT_SPEED (MAX_SPEED/2)
+#define DEFAULT_SPEED (MAX_SPEED)
+#define WALL_SAFETY_MARGIN 4
 
 #define ABS(x) ((x)<0 ? -(x) : (x))
-#define SGN(x) ((x)<0 ? -1 : ((x)>0 ? x : 0))
+#define SGN(x) ((x)<0 ? -1 : ((x)>0 ? 1 : 0))
 
 class RobotController
 {
@@ -88,7 +89,7 @@ public:
   void followWall(Side wallSide, Heading heading, int speed=DEFAULT_SPEED);
 
 private:
-  Sensor sonar[NUM_SONAR];
+  Sensor sonarArray[NUM_SONAR];
   Sensor uv[NUM_UV];
   Motor motorArray[NUM_MOTOR];
   Adafruit_MotorShield motorController;
