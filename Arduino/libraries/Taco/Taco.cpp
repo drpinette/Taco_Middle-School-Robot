@@ -83,8 +83,8 @@ float RobotController::readDistanceSonar(int sensorId)
   float distance = ((float)duration) / 74.0 / 2.0;
 
   int sensorIndex = sensorId - SONAR_ORIGIN;
-  //sonar[sensorIndex].prevVal = sonar[sensorIndex].curVal;
-  //sonar[sensorIndex].curVal = distance;
+  sonarArray[sensorIndex].prevVal = sonarArray[sensorIndex].curVal;
+  sonarArray[sensorIndex].curVal = distance;
   return distance;
 }
 
@@ -100,9 +100,8 @@ void RobotController::followWall(Side wallSide, Heading heading, int speed)
  while(1){
 	float distanceCCW = readDistanceSonar(sonarPinCCW);
 	float distanceCW = readDistanceSonar(sonarPinCW);
-	float distance = (distanceCCW + distanceCW)/2;
-	
-	float sideDifference = distance < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distance : 0;  
+	float distanceAver = (distanceCCW + distanceCW)/2;
+	float sideDifference = distanceAver < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distanceAver : 0;  
 	float angleDifference = distanceCCW - distanceCW;
 	Side sideDirection = sideDifference > 0 ? (wallSide == Left ? Right : Left) : NoSide;
 	Rotation turnDirection = (Rotation)SGN(angleDifference);
