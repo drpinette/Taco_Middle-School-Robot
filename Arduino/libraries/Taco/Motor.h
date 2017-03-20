@@ -7,8 +7,8 @@ class Motor
 {
 public:
   Adafruit_DCMotor* motor;
-  int speed;
-  int direction;
+  int curSpeed;
+  int curDirection;
   void run(int direction, int speed);
   Motor();
 };

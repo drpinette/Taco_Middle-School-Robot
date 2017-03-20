@@ -1,13 +1,16 @@
 #include <Motor.h>
 
-Motor::Motor() : direction(RELEASE), speed(0), motor(NULL)
+Motor::Motor() : curDirection(RELEASE), curSpeed(0), motor(NULL)
 {
 }
 
 void Motor::run(int direction, int speed)
 {
-  this->direction = direction;
-  this->speed = speed;
+  curDirection = direction;
+  curSpeed = speed;
+  Serial.print(curSpeed);
+  Serial.print(curDirection);
   motor->run(direction);
   motor->setSpeed(speed);
+  
 }

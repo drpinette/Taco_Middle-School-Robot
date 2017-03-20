@@ -3,12 +3,12 @@
 void RobotController::initialize()
 {
   motorController = Adafruit_MotorShield(MOTOR_CONTROLLER_ADDR);
-  for (int i = 0; i < NUM_MOTOR; i++) motor[i].motor = motorController.getMotor(i+1);
+  for (int i = 0; i < NUM_MOTOR; i++) motorArray[i].motor = motorController.getMotor(i+1);
   motorController.begin();
 
   Wire.begin();  // Set up Arduino as I2C master
 
-  for (int i = 0; i < NUM_MOTOR; i++) motor[i].run(RELEASE, 0);
+  for (int i = 0; i < NUM_MOTOR; i++) motorArray[i].run(RELEASE, 0);
 }
 
 void RobotController::go(Heading  heading, int speed, Side sideDirection, int sideSpeed, Rotation turnDirection, int turnSpeed) 
@@ -23,26 +23,31 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
   int directionRightFront = speedRightFront < 0 ? BACKWARD : FORWARD;
   int directionLeftBack = speedLeftBack < 0 ? BACKWARD : FORWARD;
   int directionRightBack = speedRightBack < 0 ? BACKWARD : FORWARD;
+  _D(speedLeftFront);_D(speedRightFront);_D(speedRightBack);_D(speedLeftBack);_NL;
+  _D(directionLeftFront);_D(directionRightFront);_D(directionLeftBack);_D(directionRightBack);_NL;
  speedLeftFront = ABS(speedLeftFront);
  speedRightFront = ABS(speedRightFront);
  speedLeftBack = ABS(speedLeftBack);  
  speedRightBack = ABS(speedRightBack);
 
   // Now assign speeds to motor controllers
-  int motorControllerOffset = (int)heading - (int)North;
-  Motor motorLeftFront = motor[motorControllerOffset];
-  Motor motorRightFront = motor[(motorControllerOffset+1) % 4];
-  Motor motorLeftBack = motor[(motorControllerOffset+2) % 4];
-  Motor motorRightBack = motor[(motorControllerOffset+3) % 4];
+  int motorControllerOffset = ((int)heading) - ((int)(Heading::North));
+  Serial.println(motorControllerOffset);
+  Motor motorLeftFront = motorArray[motorControllerOffset+0];
+  Motor motorRightFront = motorArray[(motorControllerOffset+1) % 4];
+  Motor motorRightBack = motorArray[(motorControllerOffset+2) % 4];
+  Motor motorLeftBack = motorArray[(motorControllerOffset+3) % 4];
   motorLeftFront.run(directionLeftFront, speedLeftFront);
   motorRightFront.run(directionRightFront, speedRightFront);
-  motorLeftBack.run(directionLeftBack, speedLeftBack);
   motorRightBack.run(directionRightBack, speedRightBack);
+  motorLeftBack.run(directionLeftBack, speedLeftBack);
+  _DS(motorArray[0].curSpeed);_DS(motorArray[1].curSpeed);_DS(motorArray[2].curSpeed);_DS(motorArray[3].curSpeed);_NL;
+  _DS(motorArray[0].curDirection);_DS(motorArray[1].curDirection);_DS(motorArray[2].curDirection);_DS(motorArray[3].curDirection);_NL;
 }
 
 void RobotController::stop()
 {
-  for (int i = 0; i < NUM_MOTOR; i++) motor[i].run(BRAKE, 0);
+  for (int i = 0; i < NUM_MOTOR; i++) motorArray[i].run(BRAKE, 0);
   delay(200); // Braking delay to give time to stop
 }
 
@@ -78,14 +83,32 @@ float RobotController::readDistanceSonar(int sensorId)
   float distance = ((float)duration) / 74.0 / 2.0;
 
   int sensorIndex = sensorId - SONAR_ORIGIN;
-  sonar[sensorIndex].prevVal = sonar[sensorIndex].curVal;
-  sonar[sensorIndex].curVal = distance;
+  sonarArray[sensorIndex].prevVal = sonarArray[sensorIndex].curVal;
+  sonarArray[sensorIndex].curVal = distance;
   return distance;
 }
 
 void RobotController::followWall(Side wallSide, Heading heading, int speed, Condition* stopCondition)
 {
-  // TODO Implement
+  float sideCorrectionFactor = .2;
+  float turnCorrectionFactor = .2;
+  int sonarOffset = (int)heading - (int)Heading::North;
+  int wallOffset = wallSide == Side::Left ? 4: 0;
+  int sonarPinCCW = (2+wallOffset + 2*sonarOffset % 8) + SONAR_ORIGIN;
+  int sonarPinCW = (3+wallOffset + 2*sonarOffset % 8) + SONAR_ORIGIN;
+ 
+ while(1){
+	float distanceCCW = readDistanceSonar(sonarPinCCW);
+	float distanceCW = readDistanceSonar(sonarPinCW);
+	float distanceAver = (distanceCCW + distanceCW)/2;
+	float sideDifference = distanceAver < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distanceAver : 0;  
+	float angleDifference = distanceCCW - distanceCW;
+	Side sideDirection = sideDifference > 0 ? (wallSide == Left ? Right : Left) : NoSide;
+	Rotation turnDirection = (Rotation)SGN(angleDifference);
+	int sideSpeed = (int)(sideCorrectionFactor * speed * (sideDifference / WALL_SAFETY_MARGIN));
+	int turnSpeed = (int)(turnCorrectionFactor * speed * (angleDifference / 8.0));
+	go(heading, speed, sideDirection, sideSpeed, turnDirection, turnSpeed);
+  }
 }
 
 int sonarIdAt(Heading heading, Side side, Rotation direction)
