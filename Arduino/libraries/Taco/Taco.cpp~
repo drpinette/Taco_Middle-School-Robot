@@ -29,15 +29,15 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
  speedRightBack = ABS(speedRightBack);
 
   // Now assign speeds to motor controllers
-  int motorControllerOffset = (int)heading - (int)North;
+  int motorControllerOffset = ((int)heading) - ((int)(Heading::North));
   Motor motorLeftFront = motor[motorControllerOffset];
   Motor motorRightFront = motor[(motorControllerOffset+1) % 4];
   Motor motorLeftBack = motor[(motorControllerOffset+2) % 4];
   Motor motorRightBack = motor[(motorControllerOffset+3) % 4];
   motorLeftFront.run(directionLeftFront, speedLeftFront);
-  motorRightFront.run(directionRightFront, speedRightFront);
-  motorLeftBack.run(directionLeftBack, speedLeftBack);
-  motorRightBack.run(directionRightBack, speedRightBack);
+  //motorRightFront.run(directionRightFront, speedRightFront);
+  //motorLeftBack.run(directionLeftBack, speedLeftBack);
+  //motorRightBack.run(directionRightBack, speedRightBack);
 }
 
 void RobotController::stop()
@@ -83,19 +83,8 @@ float RobotController::readDistanceSonar(int sensorId)
   return distance;
 }
 
-void RobotController::followWall(Side wallSide, Heading heading, int speed, Condition* stopCondition)
+void RobotController::followWall(Side wallSide, Heading heading, int speed)
 {
   // TODO Implement
 }
 
-int sonarIdAt(Heading heading, Side side, Rotation direction)
-{
-  int sonarOffset = ((((int)heading - (int)North) + (int)side) * 2 + (int)direction) % NUM_SONAR;
-  return SONAR_ORIGIN + sonarOffset;
-}
-
-int uvIdAt(Heading heading)
-{
-  int uvOffset = ((int)heading - (int)North) % NUM_UV;
-  return UV_ORIGIN + uvOffset;
-}
