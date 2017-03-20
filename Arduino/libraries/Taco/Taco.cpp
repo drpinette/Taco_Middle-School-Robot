@@ -31,7 +31,7 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
  speedRightBack = ABS(speedRightBack);
 
   // Now assign speeds to motor controllers
-  int motorControllerOffset = ((int)heading) - ((int)(Heading::North));
+  int motorControllerOffset = (int)heading - (int)North;
   Serial.println(motorControllerOffset);
   Motor motorLeftFront = motorArray[motorControllerOffset+0];
   Motor motorRightFront = motorArray[(motorControllerOffset+1) % 4];
@@ -92,12 +92,15 @@ void RobotController::followWall(Side wallSide, Heading heading, int speed, Cond
 {
   float sideCorrectionFactor = .2;
   float turnCorrectionFactor = .2;
-  int sonarOffset = (int)heading - (int)Heading::North;
-  int wallOffset = wallSide == Side::Left ? 4: 0;
+  int sonarOffset = (int)heading - (int)North;
+  int wallOffset = wallSide == Left ? 4: 0;
   int sonarPinCCW = (2+wallOffset + 2*sonarOffset % 8) + SONAR_ORIGIN;
   int sonarPinCW = (3+wallOffset + 2*sonarOffset % 8) + SONAR_ORIGIN;
  
- while(1){
+  // TODO Eventually use the folowing while clause
+  //while(stopCondition != NULL && !stopCondition.test())
+  while(1)
+  {
 	float distanceCCW = readDistanceSonar(sonarPinCCW);
 	float distanceCW = readDistanceSonar(sonarPinCW);
 	float distanceAver = (distanceCCW + distanceCW)/2;
@@ -109,15 +112,17 @@ void RobotController::followWall(Side wallSide, Heading heading, int speed, Cond
 	int turnSpeed = (int)(turnCorrectionFactor * speed * (angleDifference / 8.0));
 	go(heading, speed, sideDirection, sideSpeed, turnDirection, turnSpeed);
   }
+  // Delete the condition object, since we're done with it
+  if (stopCondition != NULL) delete stopCondition;
 }
 
-int sonarIdAt(Heading heading, Side side, Rotation direction)
+int RobotController::sonarIdAt(Heading heading, Side side, Rotation direction)
 {
   int sonarOffset = ((((int)heading - (int)North) + (int)side) * 2 + (int)direction) % NUM_SONAR;
   return SONAR_ORIGIN + sonarOffset;
 }
 
-int uvIdAt(Heading heading)
+int RobotController::uvIdAt(Heading heading)
 {
   int uvOffset = ((int)heading - (int)North) % NUM_UV;
   return UV_ORIGIN + uvOffset;
