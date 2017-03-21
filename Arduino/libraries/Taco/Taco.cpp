@@ -15,20 +15,34 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
 {
   // The robot is always going "forward" (in the heading direction).  Compute speeds in a generic 
   // forward direction, then assign speeds to the actual motor controllers for the given heading.
+
+  /*
   int speedLeftFront =  -speed + (-(int)sideDirection)*sideSpeed + (-(int)turnDirection)*turnSpeed;
   int speedRightFront =  speed + (-(int)sideDirection)*sideSpeed + (-(int)turnDirection)*turnSpeed;
   int speedLeftBack =   -speed +  ((int)sideDirection)*sideSpeed + (-(int)turnDirection)*turnSpeed;
   int speedRightBack =   speed +  ((int)sideDirection)*sideSpeed + (-(int)turnDirection)*turnSpeed;
+  */
+  
+  int speedLeftFront =  -speed + (-(int)sideDirection)*sideSpeed + (-(int)turnDirection)*turnSpeed;
+  int speedRightFront =  speed + (-(int)sideDirection)*sideSpeed + (-(int)turnDirection)*turnSpeed;
+  int speedLeftBack =   -speed + ((int)sideDirection)*sideSpeed + (-(int)turnDirection)*turnSpeed;
+  int speedRightBack =   speed +  ((int)sideDirection)*sideSpeed + (-(int)turnDirection)*turnSpeed;
+  
+  Serial.print("go(sideDirection): ");
+  Serial.println(sideDirection);
+  Serial.print("go(sideSpeed): ");
+  Serial.println(sideSpeed);
+  
   int directionLeftFront = speedLeftFront < 0 ? BACKWARD : FORWARD;
   int directionRightFront = speedRightFront < 0 ? BACKWARD : FORWARD;
   int directionLeftBack = speedLeftBack < 0 ? BACKWARD : FORWARD;
   int directionRightBack = speedRightBack < 0 ? BACKWARD : FORWARD;
   _D(speedLeftFront);_D(speedRightFront);_D(speedRightBack);_D(speedLeftBack);_NL;
   _D(directionLeftFront);_D(directionRightFront);_D(directionLeftBack);_D(directionRightBack);_NL;
- speedLeftFront = ABS(speedLeftFront);
- speedRightFront = ABS(speedRightFront);
- speedLeftBack = ABS(speedLeftBack);  
- speedRightBack = ABS(speedRightBack);
+  speedLeftFront = ABS(speedLeftFront);
+  speedRightFront = ABS(speedRightFront);
+  speedLeftBack = ABS(speedLeftBack);  
+  speedRightBack = ABS(speedRightBack);
 
   // Now assign speeds to motor controllers
   int motorControllerOffset = ((int)heading) - ((int)(Heading::North));
@@ -43,6 +57,7 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
   motorLeftBack.run(directionLeftBack, speedLeftBack);
   _DS(motorArray[0].curSpeed);_DS(motorArray[1].curSpeed);_DS(motorArray[2].curSpeed);_DS(motorArray[3].curSpeed);_NL;
   _DS(motorArray[0].curDirection);_DS(motorArray[1].curDirection);_DS(motorArray[2].curDirection);_DS(motorArray[3].curDirection);_NL;
+  Serial.println("_____________End_____________");
 }
 
 void RobotController::stop()
@@ -96,17 +111,45 @@ void RobotController::followWall(Side wallSide, Heading heading, int speed)
   int wallOffset = wallSide == Side::Left ? 4: 0;
   int sonarPinCCW = (2+wallOffset + 2*sonarOffset % 8) + SONAR_ORIGIN;
   int sonarPinCW = (3+wallOffset + 2*sonarOffset % 8) + SONAR_ORIGIN;
- 
- while(1){
+  
+  while(1)
+  {
 	float distanceCCW = readDistanceSonar(sonarPinCCW);
 	float distanceCW = readDistanceSonar(sonarPinCW);
 	float distanceAver = (distanceCCW + distanceCW)/2;
-	float sideDifference = distanceAver < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distanceAver : 0;  
+	
+	//Previous: float sideDifference = distanceAver < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distanceAver : 0;  
+	float sideDifference = WALL_SAFETY_MARGIN - distanceAver;
 	float angleDifference = distanceCCW - distanceCW;
-	Side sideDirection = sideDifference > 0 ? (wallSide == Left ? Right : Left) : NoSide;
+	
+	//Previous: Side sideDirection = sideDifference > 0 ? (wallSide == Left ? Right : Left) : NoSide;
+	Side sideDirection = wallSide == Right ? (sideDifference > 0 ? Left : Right) : (sideDifference > 0 ? Right : Left);
 	Rotation turnDirection = (Rotation)SGN(angleDifference);
-	int sideSpeed = (int)(sideCorrectionFactor * speed * (sideDifference / WALL_SAFETY_MARGIN));
-	int turnSpeed = (int)(turnCorrectionFactor * speed * (angleDifference / 8.0));
+	
+	//Need absolute value, we'll use the value of the sideDirection and turnDirection to manipulate the speed calculations
+	int sideSpeed = (int)ABS(sideCorrectionFactor * speed * (sideDifference / WALL_SAFETY_MARGIN));
+	int turnSpeed = (int)ABS(turnCorrectionFactor * speed * (angleDifference / 8.0));
+	Serial.println("_____________Begin_____________");
+	Serial.print("distanceCounterCW: ");
+	Serial.println(distanceCCW);
+	Serial.print("distanceCW: ");
+	Serial.println(distanceCW);
+	Serial.print("distanceAver: ");
+	Serial.println(distanceAver);
+	Serial.print("sideDifference: ");
+	Serial.println(sideDifference);
+	Serial.print("angleDifference: ");
+	Serial.println(angleDifference);	
+	Serial.println();	
+	Serial.print("sideDirection: ");
+	Serial.println(sideDirection);
+	Serial.print("turnDirection: ");
+	Serial.println(turnDirection);
+	Serial.print("sideSpeed: ");
+	Serial.println(sideSpeed);
+	Serial.print("turnSpeed: ");
+	Serial.println(turnSpeed);
+	
 	go(heading, speed, sideDirection, sideSpeed, turnDirection, turnSpeed);
   }
 }

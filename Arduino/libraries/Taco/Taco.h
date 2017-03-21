@@ -72,7 +72,7 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 #define MOTOR_ORIGIN 1
 
 #define MAX_SPEED 255
-#define DEFAULT_SPEED (MAX_SPEED)
+#define DEFAULT_SPEED 130
 #define WALL_SAFETY_MARGIN 4
 
 #define ABS(x) ((x)<0 ? -(x) : (x))
