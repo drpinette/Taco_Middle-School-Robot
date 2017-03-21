@@ -75,7 +75,7 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 #define MAX_SPEED 255
 #define TURN_CORRECTION_FACTOR 0.2
 #define SIDE_CORRECTION_FACTOR 0.2
-#define DEFAULT_SPEED ((int)(MAX_SPEED*(1.0-TURN_CORRECTION_FACTOR-SIDE_CORRECTION_FACTOR)))
+#define DEFAULT_SPEED ((int)(MAX_SPEED*(1.0-TURN_CORRECTION_FACTOR-SIDE_CORRECTION_FACTOR)))  //current 153
 #define WALL_SAFETY_MARGIN 4.0
 
 #define ABS(x) ((x)<0 ? -(x) : (x))
@@ -89,7 +89,7 @@ public:
   void stop();
   int readUv(int sensorId);
   float readDistanceSonar(int sensorId);
-  void followWall(Side wallSide, Heading heading, int speed, Condition* stopCondition);
+  void followWall(Side wallSide, Heading heading, int speed);//Condition* stopCondition);
   void move(Heading heading, int speed, Condition* stopCondition);
   int sonarIdAt(Heading heading, Side side, Rotation direction);
   int uvIdAt(Heading heading);

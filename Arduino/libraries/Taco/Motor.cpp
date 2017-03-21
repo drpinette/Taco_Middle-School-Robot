@@ -8,8 +8,8 @@ void Motor::run(int direction, int speed)
 {
   curDirection = direction;
   curSpeed = speed;
-  Serial.print(curSpeed);
-  Serial.print(curDirection);
+  //Serial.print(curSpeed);
+  //Serial.print(curDirection);
   motor->run(direction);
   motor->setSpeed(speed);
   

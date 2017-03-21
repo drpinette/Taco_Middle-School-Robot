@@ -41,8 +41,8 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
   motorRightFront->run(directionRightFront, speedRightFront);
   motorRightBack->run(directionRightBack, speedRightBack);
   motorLeftBack->run(directionLeftBack, speedLeftBack);
-  _DS(motorArray[0].curSpeed);_DS(motorArray[1].curSpeed);_DS(motorArray[2].curSpeed);_DS(motorArray[3].curSpeed);_NL;
-  _DS(motorArray[0].curDirection);_DS(motorArray[1].curDirection);_DS(motorArray[2].curDirection);_DS(motorArray[3].curDirection);_NL;
+  //_DS(motorArray[0].curSpeed);_DS(motorArray[1].curSpeed);_DS(motorArray[2].curSpeed);_DS(motorArray[3].curSpeed);_NL;
+  //_DS(motorArray[0].curDirection);_DS(motorArray[1].curDirection);_DS(motorArray[2].curDirection);_DS(motorArray[3].curDirection);_NL;
 }
 
 void RobotController::stop()
@@ -88,7 +88,7 @@ float RobotController::readDistanceSonar(int sensorId)
   return distance;
 }
 
-void RobotController::followWall(Side wallSide, Heading heading, int speed, Condition* stopCondition)
+void RobotController::followWall(Side wallSide, Heading heading, int speed) //Condition* stopCondition)
 {
   int sonarOffset = (int)heading - (int)North;
   int wallOffset = wallSide == Left ? 4: 0;
@@ -100,18 +100,24 @@ void RobotController::followWall(Side wallSide, Heading heading, int speed, Cond
   while(1)
   {
 	float distanceCCW = readDistanceSonar(sonarPinCCW);
+	delay(10);
 	float distanceCW = readDistanceSonar(sonarPinCW);
+	delay(10);
+	_D(distanceCCW); _NL; _D(distanceCW); _NL;
 	float distanceAver = (distanceCCW + distanceCW)/2;
-	float sideDifference = distanceAver < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distanceAver : 0;  
+	//float sideDifference = distanceAver < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distanceAver : 0;  
+	float sideDifference = WALL_SAFETY_MARGIN - distanceAver;
 	float angleDifference = distanceCCW - distanceCW;
-	Side sideDirection = sideDifference > 0 ? (wallSide == Left ? Right : Left) : NoSide;
+	//Side sideDirection = sideDifference > 0 ? (wallSide == Left ? Right : Left) : NoSide;
+	Side sideDirection = sideDifference > 0 ? Left : Right;
 	Rotation turnDirection = (Rotation)SGN(angleDifference);
-	int sideSpeed = (int)(SIDE_CORRECTION_FACTOR * speed * (sideDifference / WALL_SAFETY_MARGIN));
-	int turnSpeed = (int)(TURN_CORRECTION_FACTOR * speed * (angleDifference / 8.0));
+	int sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / WALL_SAFETY_MARGIN));
+	int turnSpeed = (int)ABS(TURN_CORRECTION_FACTOR * speed * (angleDifference / 8.0));
+	_D(heading); _D(sideDirection); _D(sideSpeed); _D(turnDirection); _D(turnSpeed);_NL; 
 	go(heading, speed, sideDirection, sideSpeed, turnDirection, turnSpeed);
   }
   // Delete the condition object, since we're done with it
-  if (stopCondition != NULL) delete stopCondition;
+ // if (stopCondition != NULL) delete stopCondition;
 }
 
 int RobotController::sonarIdAt(Heading heading, Side side, Rotation direction)
