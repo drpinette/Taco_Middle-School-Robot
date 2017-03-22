@@ -89,7 +89,7 @@ public:
   void stop();
   int readUv(int sensorId);
   float readDistanceSonar(int sensorId);
-  void followWall(Side wallSide, Heading heading, int speed);//Condition* stopCondition);
+  void followWall(Side wallSide, Heading heading, int speed, Condition* stopCondition);
   void move(Heading heading, int speed, Condition* stopCondition);
   int sonarIdAt(Heading heading, Side side, Rotation direction);
   int uvIdAt(Heading heading);

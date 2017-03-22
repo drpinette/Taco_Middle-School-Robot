@@ -100,24 +100,28 @@ void RobotController::followWall(Side wallSide, Heading heading, int speed) //Co
   while(1)
   {
 	float distanceCCW = readDistanceSonar(sonarPinCCW);
-	delay(10);
+	delay(10);  //added delay to prevent signal interference
 	float distanceCW = readDistanceSonar(sonarPinCW);
-	delay(10);
+	delay(10);  //added delay to prevent signal interference
 	_D(distanceCCW); _NL; _D(distanceCW); _NL;
+	
 	float distanceAver = (distanceCCW + distanceCW)/2;
-	//float sideDifference = distanceAver < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distanceAver : 0;  
+	//Old Code: float sideDifference = distanceAver < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distanceAver : 0;  
 	float sideDifference = WALL_SAFETY_MARGIN - distanceAver;
 	float angleDifference = distanceCCW - distanceCW;
-	//Side sideDirection = sideDifference > 0 ? (wallSide == Left ? Right : Left) : NoSide;
+	
+	//Old Code: Side sideDirection = sideDifference > 0 ? (wallSide == Left ? Right : Left) : NoSide;
 	Side sideDirection = sideDifference > 0 ? Left : Right;
 	Rotation turnDirection = (Rotation)SGN(angleDifference);
+	//Added ABS to speed values
 	int sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / WALL_SAFETY_MARGIN));
 	int turnSpeed = (int)ABS(TURN_CORRECTION_FACTOR * speed * (angleDifference / 8.0));
 	_D(heading); _D(sideDirection); _D(sideSpeed); _D(turnDirection); _D(turnSpeed);_NL; 
+	
 	go(heading, speed, sideDirection, sideSpeed, turnDirection, turnSpeed);
   }
   // Delete the condition object, since we're done with it
- // if (stopCondition != NULL) delete stopCondition;
+ if (stopCondition != NULL) delete stopCondition;
 }
 
 int RobotController::sonarIdAt(Heading heading, Side side, Rotation direction)

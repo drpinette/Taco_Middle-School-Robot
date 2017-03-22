@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include <Adafruit_MotorShield.h>
 #include <Wire.h>
+#include <Condition.h>
 
 RobotController* RC;
 
