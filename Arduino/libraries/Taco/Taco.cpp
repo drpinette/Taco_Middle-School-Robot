@@ -34,9 +34,9 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
   int motorControllerOffset = (int)heading - (int)North;
   Serial.println(motorControllerOffset);
   Motor* motorLeftFront = &(motorArray[motorControllerOffset+0]);
-  Motor* motorRightFront = &(motorArray[(motorControllerOffset+1) % 4]);
-  Motor* motorRightBack = &(motorArray[(motorControllerOffset+2) % 4]);
-  Motor* motorLeftBack = &(motorArray[(motorControllerOffset+3) % 4]);
+Motor* motorRightFront = &(motorArray[MOD(motorControllerOffset+1, 4)]);
+  Motor* motorRightBack = &(motorArray[MOD(motorControllerOffset+2, 4)]);
+  Motor* motorLeftBack = &(motorArray[MOD(motorControllerOffset+3, 4)]);
   motorLeftFront->run(directionLeftFront, speedLeftFront);
   motorRightFront->run(directionRightFront, speedRightFront);
   motorRightBack->run(directionRightBack, speedRightBack);
@@ -88,22 +88,22 @@ float RobotController::readDistanceSonar(int sensorId)
   return distance;
 }
 
-void RobotController::followWall(Side wallSide, Heading heading, int speed) //Condition* stopCondition)
+void RobotController::followWall(Side wallSide, Heading heading, int speed, Condition* stopCondition)
 {
   int sonarOffset = (int)heading - (int)North;
   int wallOffset = wallSide == Left ? 4: 0;
-  int sonarPinCCW = (2+wallOffset + 2*sonarOffset % 8) + SONAR_ORIGIN;
-  int sonarPinCW = (3+wallOffset + 2*sonarOffset % 8) + SONAR_ORIGIN;
+  int sonarPinCCW = MOD(2+wallOffset + 2*sonarOffset, 8) + SONAR_ORIGIN;
+  int sonarPinCW = MOD(3+wallOffset + 2*sonarOffset, 8) + SONAR_ORIGIN;
  
   // TODO Eventually use the folowing while clause
-  //while(stopCondition != NULL && !stopCondition.test())
-  while(1)
+  while(stopCondition != NULL && !stopCondition->test())
+  //while(1)
   {
 	float distanceCCW = readDistanceSonar(sonarPinCCW);
 	delay(10);  //added delay to prevent signal interference
 	float distanceCW = readDistanceSonar(sonarPinCW);
 	delay(10);  //added delay to prevent signal interference
-	_D(distanceCCW); _NL; _D(distanceCW); _NL;
+	//_D(distanceCCW); _NL; _D(distanceCW); _NL;
 	
 	float distanceAver = (distanceCCW + distanceCW)/2;
 	//Old Code: float sideDifference = distanceAver < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distanceAver : 0;  
@@ -116,7 +116,6 @@ void RobotController::followWall(Side wallSide, Heading heading, int speed) //Co
 	//Added ABS to speed values
 	int sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / WALL_SAFETY_MARGIN));
 	int turnSpeed = (int)ABS(TURN_CORRECTION_FACTOR * speed * (angleDifference / 8.0));
-	_D(heading); _D(sideDirection); _D(sideSpeed); _D(turnDirection); _D(turnSpeed);_NL; 
 	
 	go(heading, speed, sideDirection, sideSpeed, turnDirection, turnSpeed);
   }
@@ -126,12 +125,12 @@ void RobotController::followWall(Side wallSide, Heading heading, int speed) //Co
 
 int RobotController::sonarIdAt(Heading heading, Side side, Rotation direction)
 {
-  int sonarOffset = ((((int)heading - (int)North) + (int)side) * 2 + (int)direction) % NUM_SONAR;
+  int sonarOffset = MOD((((int)heading - (int)North) + (int)side) * 2 + (direction == CCW ? 0 : 1), NUM_SONAR);
   return SONAR_ORIGIN + sonarOffset;
 }
 
 int RobotController::uvIdAt(Heading heading)
 {
-  int uvOffset = ((int)heading - (int)North) % NUM_UV;
+  int uvOffset = MOD((int)heading - (int)North, NUM_UV);
   return UV_ORIGIN + uvOffset;
 }

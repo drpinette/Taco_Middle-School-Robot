@@ -80,6 +80,7 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 
 #define ABS(x) ((x)<0 ? -(x) : (x))
 #define SGN(x) ((x)<0 ? -1 : ((x)>0 ? 1 : 0))
+#define MOD(x, m) (((x)%(m))<0 ? ((x)%(m))+m : ((x)%(m)))
 
 class RobotController
 {
