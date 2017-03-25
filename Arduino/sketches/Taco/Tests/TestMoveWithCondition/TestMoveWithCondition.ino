@@ -1,5 +1,6 @@
 #define DEBUG
 #include <Taco.h>
+#include <Condition.h>
 #include <Arduino.h>
 #include <Adafruit_MotorShield.h>
 #include <Wire.h>
@@ -11,10 +12,8 @@ void setup() {
   RC->initialize();
   delay(5000);
   Serial.begin(9600);
-  
-  //RC->followWall(Right, North, DEFAULT_SPEED);
-  followWall(Right, North, DEFAULT_SPEED);
-  delay(4000);
+  _DS("Starting"); _NL;
+  RC->move(North, DEFAULT_SPEED, new False());
   RC->stop();
  
   

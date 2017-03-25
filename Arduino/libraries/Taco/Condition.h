@@ -48,5 +48,16 @@ private:
   Condition** conditions;
 };
 
+class True : public Condition
+{
+public:
+  bool test();
+};
+
+class False : public Condition
+{
+public:
+  bool test();
+};
 /////////////////////////////////////////////////////////////////////////////
 #endif

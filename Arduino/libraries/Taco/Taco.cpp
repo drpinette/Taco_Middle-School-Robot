@@ -1,3 +1,4 @@
+//#define DEBUG
 #include <Taco.h>
 
 void RobotController::initialize()
@@ -32,7 +33,7 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
 
   // Now assign speeds to motor controllers
   int motorControllerOffset = (int)heading - (int)North;
-  Serial.println(motorControllerOffset);
+  //Serial.println(motorControllerOffset);
   Motor* motorLeftFront = &(motorArray[motorControllerOffset+0]);
 Motor* motorRightFront = &(motorArray[MOD(motorControllerOffset+1, 4)]);
   Motor* motorRightBack = &(motorArray[MOD(motorControllerOffset+2, 4)]);
@@ -97,26 +98,23 @@ void RobotController::followWall(Side wallSide, Heading heading, int speed, Cond
  
   // TODO Eventually use the folowing while clause
   while(stopCondition != NULL && !stopCondition->test())
-  //while(1)
   {
 	float distanceCCW = readDistanceSonar(sonarPinCCW);
 	delay(10);  //added delay to prevent signal interference
 	float distanceCW = readDistanceSonar(sonarPinCW);
 	delay(10);  //added delay to prevent signal interference
-	//_D(distanceCCW); _NL; _D(distanceCW); _NL;
+	_D(distanceCCW); _NL; _D(distanceCW); _NL;
 	
 	float distanceAver = (distanceCCW + distanceCW)/2;
-	//Old Code: float sideDifference = distanceAver < WALL_SAFETY_MARGIN ? WALL_SAFETY_MARGIN - distanceAver : 0;  
 	float sideDifference = WALL_SAFETY_MARGIN - distanceAver;
 	float angleDifference = distanceCCW - distanceCW;
 	
-	//Old Code: Side sideDirection = sideDifference > 0 ? (wallSide == Left ? Right : Left) : NoSide;
-	Side sideDirection = sideDifference > 0 ? Left : Right;
+	Side sideDirection = sideDifference > 0 ? (wallSide == Right ? Left : Right) : (wallSide == Right ? Right : Left);
 	Rotation turnDirection = (Rotation)SGN(angleDifference);
-	//Added ABS to speed values
-	int sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / WALL_SAFETY_MARGIN));
-	int turnSpeed = (int)ABS(TURN_CORRECTION_FACTOR * speed * (angleDifference / 8.0));
-	
+	int sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / MAX_SIDE_CORRECTION));
+	int turnSpeed = (int)ABS(TURN_CORRECTION_FACTOR * speed * (angleDifference / 0.5));
+	_D(turnDirection); _D(turnSpeed); _NL;
+	_D(sideSpeed); _D(sideDirection); _NL;
 	go(heading, speed, sideDirection, sideSpeed, turnDirection, turnSpeed);
   }
   // Delete the condition object, since we're done with it
@@ -133,4 +131,34 @@ int RobotController::uvIdAt(Heading heading)
 {
   int uvOffset = MOD((int)heading - (int)North, NUM_UV);
   return UV_ORIGIN + uvOffset;
+}
+
+void RobotController::move(Heading heading, int speed, Condition* stopCondition)
+{
+	int sonarOffset = (int)heading - (int)North;
+	int sonarPinLeft= MOD(-1 + 2*sonarOffset, 8) + SONAR_ORIGIN;
+	int sonarPinRight = MOD(2 + 2*sonarOffset, 8) + SONAR_ORIGIN;
+	while (!stopCondition->test())
+	{
+		int sideDirection = NoSide;
+		int sideSpeed = 0;
+		float distanceLeft = readDistanceSonar(sonarPinLeft);
+		if (distanceLeft < WALL_SAFETY_MARGIN) {
+			float sideDifference = WALL_SAFETY_MARGIN - distanceLeft;
+			sideDirection = Right;
+			sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / MAX_SIDE_CORRECTION));
+			delay(10);			
+		}
+		else{
+			float distanceRight = readDistanceSonar(sonarPinRight);
+			if (distanceRight < WALL_SAFETY_MARGIN){
+				float sideDifference = WALL_SAFETY_MARGIN - distanceRight;
+				sideDirection = Left;
+				sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / MAX_SIDE_CORRECTION));
+				delay(10);
+			}
+		}
+		_D(sideSpeed); _D(sideDirection); _NL;
+		go(heading, speed, sideDirection, sideSpeed, NoRotation, 0);
+	}
 }

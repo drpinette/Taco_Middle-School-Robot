@@ -8,7 +8,7 @@
 #include <Motor.h>
 #include <Condition.h>
 
-#define DEBUG
+//#define DEBUG
 //#undef DEBUG
 
 enum Rotation { NoRotation = 0, CW  = 1 /*Clockwise*/, CCW = -1 /*Counterclockwise*/ };
@@ -77,6 +77,7 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 #define SIDE_CORRECTION_FACTOR 0.2
 #define DEFAULT_SPEED ((int)(MAX_SPEED*(1.0-TURN_CORRECTION_FACTOR-SIDE_CORRECTION_FACTOR)))  //current 153
 #define WALL_SAFETY_MARGIN 4.0
+#define MAX_SIDE_CORRECTION (WALL_SAFETY_MARGIN/1.5)
 
 #define ABS(x) ((x)<0 ? -(x) : (x))
 #define SGN(x) ((x)<0 ? -1 : ((x)>0 ? 1 : 0))

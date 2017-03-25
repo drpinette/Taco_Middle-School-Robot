@@ -26,7 +26,9 @@ DistanceFor::DistanceFor(int sonarId, Comparison comparison, float thresholdDist
 
 bool DistanceFor::test() 
 {
-  return Compare(robotController->readDistanceSonar(sonarId), comparison, thresholdDistance);
+  bool result = Compare(robotController->readDistanceSonar(sonarId), comparison, thresholdDistance);
+  delay(10);
+  return result;
 }
 
 All::All(Condition* conditions[])
@@ -67,3 +69,12 @@ bool Any::test()
   return false;
 }
 
+bool True::test()
+{
+  return true;
+}
+
+bool False::test()
+{
+  return false;
+}
