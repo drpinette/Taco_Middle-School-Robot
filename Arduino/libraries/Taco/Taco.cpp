@@ -27,6 +27,11 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
   _D(speedLeftFront);_D(speedRightFront);_D(speedRightBack);_D(speedLeftBack);_NL;
   _D(directionLeftFront);_D(directionRightFront);_D(directionLeftBack);_D(directionRightBack);_NL;
 
+  speedLeftFront = ABS(speedLeftFront);
+  speedRightFront = ABS(speedRightFront);
+  speedLeftBack = ABS(speedLeftBack);  
+  speedRightBack = ABS(speedRightBack);
+  
   // Scale the speeds so the fastest wheel is always at the default speed
   int maxSpeed = MAX(MAX(speedLeftFront, speedRightFront),MAX(speedLeftBack, speedRightBack));
   float speedScaling = ((float)DEFAULT_SPEED )/ ((float)maxSpeed);
