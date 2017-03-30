@@ -46,6 +46,22 @@ Motor* motorRightFront = &(motorArray[MOD(motorControllerOffset+1, 4)]);
   //_DS(motorArray[0].curDirection);_DS(motorArray[1].curDirection);_DS(motorArray[2].curDirection);_DS(motorArray[3].curDirection);_NL;
 }
 
+void RobotController::rotate(int speed, Condition* stopCondition)
+{
+	while(stopCondition != NULL && !stopCondition->test())
+	{
+		Motor* motorLeftFront = &motorArray[0];
+		Motor* motorLeftBack = &motorArray[1];
+		Motor* motorRightFront = &motorArray[2];
+		Motor* motorRightBack = &motorArray[3];
+		motorLeftFront->run(BACKWARD, speed);
+		motorLeftBack->run(BACKWARD, speed);
+		motorRightFront->run(BACKWARD, speed);
+		motorRightBack->run(BACKWARD, speed);
+	}
+	
+}
+
 void RobotController::stop()
 {
   for (int i = 0; i < NUM_MOTOR; i++) motorArray[i].run(BRAKE, 0);

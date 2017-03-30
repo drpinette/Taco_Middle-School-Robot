@@ -95,7 +95,7 @@ public:
   void move(Heading heading, int speed, Condition* stopCondition);
   int sonarIdAt(Heading heading, Side side, Rotation direction);
   int uvIdAt(Heading heading);
-
+  void rotate(int speed, Condition* stopCondition);
 
 private:
   Sensor sonarArray[NUM_SONAR];

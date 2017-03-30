@@ -1,4 +1,4 @@
-#define DEBUG
+//#define DEBUG
 #include <Condition.h>
 #include <Taco.h>
 
@@ -26,7 +26,9 @@ DistanceFor::DistanceFor(int sonarId, Comparison comparison, float thresholdDist
 
 bool DistanceFor::test() 
 {
-  bool result = Compare(robotController->readDistanceSonar(sonarId), comparison, thresholdDistance);
+  float distance = robotController->readDistanceSonar(sonarId);
+  bool result = Compare(distance, comparison, thresholdDistance);
+  _D(distance); _D(sonarId); _NL;
   delay(10);
   return result;
 }
