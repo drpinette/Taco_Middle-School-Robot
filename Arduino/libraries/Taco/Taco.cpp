@@ -55,18 +55,11 @@ void RobotController::go(Heading  heading, int speed, Side sideDirection, int si
   //_DS(motorArray[0].curDirection);_DS(motorArray[1].curDirection);_DS(motorArray[2].curDirection);_DS(motorArray[3].curDirection);_NL;
 }
 
-void RobotController::rotate(int speed, Condition* stopCondition)
+void RobotController::rotate(int speed, Rotation turnDirection, Condition* stopCondition)
 {
 	while(stopCondition != NULL && !stopCondition->test())
 	{
-		Motor* motorLeftFront = &motorArray[0];
-		Motor* motorLeftBack = &motorArray[1];
-		Motor* motorRightFront = &motorArray[2];
-		Motor* motorRightBack = &motorArray[3];
-		motorLeftFront->run(BACKWARD, speed);
-		motorLeftBack->run(BACKWARD, speed);
-		motorRightFront->run(BACKWARD, speed);
-		motorRightBack->run(BACKWARD, speed);
+		go(North, 0, NoSide, 0, turnDirection, speed);
 	}
 	
 }
@@ -186,4 +179,12 @@ void RobotController::move(Heading heading, int speed, Condition* stopCondition)
 		_D(sideSpeed); _D(sideDirection); _NL;
 		go(heading, speed, sideDirection, sideSpeed, NoRotation, 0);
 	}
+}
+
+void RobotController::extinguish(bool on)
+{
+	servo.attach(EXTINGUISHER);
+	servo.write(on ? 180 : 0);
+	delay(on ? 99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999 : 2000);
+	servo.detach();
 }

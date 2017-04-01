@@ -7,6 +7,7 @@
 #include <Sensor.h>
 #include <Motor.h>
 #include <Condition.h>
+#include <Servo.h>
 
 //#define DEBUG
 //#undef DEBUG
@@ -96,13 +97,15 @@ public:
   void move(Heading heading, int speed, Condition* stopCondition);
   int sonarIdAt(Heading heading, Side side, Rotation direction);
   int uvIdAt(Heading heading);
-  void rotate(int speed, Condition* stopCondition);
+  void rotate(int speed, Rotation turnDirection, Condition* stopCondition);
+  void extinguish(bool on);
 
 private:
   Sensor sonarArray[NUM_SONAR];
   Sensor uv[NUM_UV];
   Motor motorArray[NUM_MOTOR];
   Adafruit_MotorShield motorController;
+  Servo servo;
 };
 
 
