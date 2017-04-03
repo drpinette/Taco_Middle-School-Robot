@@ -21,6 +21,8 @@ void setup() {
  {
   
  }
+  delay(100);
+  int maxUv = 10 + MAX(MAX( RC->readUv(NORTH_UV), RC->readUv(SOUTH_UV)), MAX(RC->readUv(EAST_UV), RC->readUv(WEST_UV)));
   if(RC->readDistanceSonar(EAST_CCW_SONAR) < 12 && RC->readDistanceSonar(EAST_CW_SONAR) < 12)
   {
     //In Correct Starting Position - Do nothing
@@ -77,7 +79,7 @@ void setup() {
     RC->followWall(Left, West, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(West, Right, CW), MoreThan, 8.5, RC));
     //moving into room four/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     RC->move(North, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(North, NoSide, CCW), LessThan, 5.0, RC));
-    if (RC->readUv(NORTH_UV) > 80 || RC->readUv(EAST_UV) > 80)
+    if (RC->readUv(NORTH_UV) > maxUv || RC->readUv(EAST_UV) > maxUv)
     {
       RC->stop();
       digitalWrite(13, HIGH);
@@ -112,6 +114,7 @@ void setup() {
   RC->move(North, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(North, Right, CW), MoreThan, 12.0, RC));
   //RC->stop();
   //delay(5000);
+  
   RC->move(North, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(North, Right, CCW), LessThan, 12.0, RC));
   //RC->stop();
   //delay(5000);
@@ -129,7 +132,7 @@ void setup() {
    //Checking 1st Room//////////////////////////////////////////////////////////////////////////////////////////////////////////////
    RC->followWall(Left, East, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(East, NoSide, CW), LessThan, 17.0, RC));
  
-   if (RC->readUv(EAST_UV) > 80 || RC->readUv(SOUTH_UV) > 80)
+   if (RC->readUv(EAST_UV) > maxUv || RC->readUv(SOUTH_UV) > maxUv)
    {
     RC->stop();
     digitalWrite(13, HIGH);
@@ -145,25 +148,22 @@ void setup() {
       RC->move(South, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(South, Right, CW), LessThan, 12.0, RC));
       RC->followWall(Right, South, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(South, NoSide, CW), LessThan, 5.0, RC));
       RC->stop();
-      float distanceToWall = RC->readDistanceSonar(RC->sonarIdAt(South, NoSide, CW));
-      RC->rotate(DEFAULT_SPEED, CW, new DistanceFor(RC->sonarIdAt(North, NoSide, CCW), LessThan, distanceToWall, RC));
-      RC->stop();
-      RC->extinguish(true);
-    }
-   }
-  else
-  {
-    RC->followWall(Left, East, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(East, NoSide, CW), LessThan, 5.0, RC));
-    if (RC->readUv(SOUTH_UV) > 80)
-    {
-     RC->stop();
-     digitalWrite(13,HIGH);
-     RC->followWall(Left, South, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(South, NoSide, CCW), LessThan, 5.0, RC));
-     RC->stop();
-     float distanceToWall = RC->readDistanceSonar(RC->sonarIdAt(South, Left, CW));
-     RC->rotate(DEFAULT_SPEED, CW, new DistanceFor(RC->sonarIdAt(North, NoSide, CCW), LessThan, (distanceToWall + 1), RC));
-     RC->stop();
-     RC->extinguish(true);
+      if (RC->readUv(EAST_UV) < RC->readUv(SOUTH_UV))
+      {
+        float distanceToWall = RC->readDistanceSonar(RC->sonarIdAt(South, NoSide, CW));
+        RC->rotate(DEFAULT_SPEED, CW, new DistanceFor(RC->sonarIdAt(North, NoSide, CCW), LessThan, distanceToWall, RC));
+        RC->stop();
+        RC->extinguish(true);
+      }
+      else
+      {
+        RC->followWall(Right, East, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(East, NoSide, CCW), LessThan, 5.0, RC));
+        RC->stop();
+        float distanceToWall = RC->readDistanceSonar(RC->sonarIdAt(South, Left, CW));
+        RC->rotate(DEFAULT_SPEED, CW, new DistanceFor(RC->sonarIdAt(North, NoSide, CCW), LessThan, (distanceToWall + 1), RC));
+        RC->stop();
+        RC->extinguish(true);
+      }
     }
    }
    RC->stop();
@@ -173,7 +173,7 @@ void setup() {
    RC->followWall(Right, West, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(West, NoSide, CCW), LessThan, 37.4, RC));
 
   //checking second room////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    if (RC->readUv(SOUTH_UV) > 80)
+    if (RC->readUv(SOUTH_UV) > maxUv)
    {
     digitalWrite(13, HIGH);
     RC->move(South, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(South, Left, CW), LessThan, 12.0, RC));
@@ -190,7 +190,7 @@ void setup() {
   {
     RC->followWall(Right, West, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(West, NoSide, CW), LessThan, 5.0, RC));
     RC->stop();
-    if (RC->readUv(WEST_UV) > 80)
+    if (RC->readUv(WEST_UV) > maxUv)
     {
      digitalWrite(13,HIGH);
      float distanceToWall = RC->readDistanceSonar(RC->sonarIdAt(North, NoSide, CCW));
@@ -219,7 +219,7 @@ void setup() {
 //moving into third room////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
    RC->followWall(Left, South, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(South, NoSide, CW), LessThan, 24.0, RC));
  
-   if (RC->readUv(WEST_UV) > 80)
+   if (RC->readUv(WEST_UV) > maxUv)
    {
     RC->stop();
     digitalWrite(13, HIGH);
@@ -233,7 +233,7 @@ void setup() {
   else
   {
     RC->followWall(Left, South, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(South, NoSide, CCW), LessThan, 5.0, RC));
-    if (RC->readUv(SOUTH_UV) > 80 || RC->readUv(WEST_UV) > 80)
+    if (RC->readUv(SOUTH_UV) > maxUv || RC->readUv(WEST_UV) > maxUv)
     {
      RC->stop();
      digitalWrite(13,HIGH);
@@ -273,7 +273,7 @@ void setup() {
   RC->stop();
   //moving into room four///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     RC->move(North, DEFAULT_SPEED, new DistanceFor(RC->sonarIdAt(North, NoSide, CCW), LessThan, 5.0, RC));
-    if (RC->readUv(NORTH_UV) > 80 || RC->readUv(EAST_UV) > 80)
+    if (RC->readUv(NORTH_UV) > maxUv || RC->readUv(EAST_UV) > maxUv)
     {
       RC->stop();
       digitalWrite(13, HIGH);
@@ -307,5 +307,4 @@ void setup() {
 
 void loop() {
   // don't use
-
 } 

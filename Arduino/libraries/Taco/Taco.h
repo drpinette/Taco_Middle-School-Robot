@@ -77,7 +77,7 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 #define TURN_CORRECTION_FACTOR 0.2
 #define SIDE_CORRECTION_FACTOR 0.2
 #define DEFAULT_SPEED (MAX_SPEED)
-#define WALL_SAFETY_MARGIN 4.0
+#define WALL_SAFETY_MARGIN 3.0
 #define ANGLE_SAFETY_MARGIN 1.0
 
 #define ABS(x) ((x)<0 ? -(x) : (x))

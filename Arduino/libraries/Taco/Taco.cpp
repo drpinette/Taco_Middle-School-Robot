@@ -153,6 +153,7 @@ int RobotController::uvIdAt(Heading heading)
 
 void RobotController::move(Heading heading, int speed, Condition* stopCondition)
 {
+	float avoidMargin = 2.0;
 	int sonarOffset = (int)heading - (int)North;
 	int sonarPinLeft= MOD(-1 + 2*sonarOffset, 8) + SONAR_ORIGIN;
 	int sonarPinRight = MOD(2 + 2*sonarOffset, 8) + SONAR_ORIGIN;
@@ -161,18 +162,18 @@ void RobotController::move(Heading heading, int speed, Condition* stopCondition)
 		Side sideDirection = NoSide;
 		int sideSpeed = 0;
 		float distanceLeft = readDistanceSonar(sonarPinLeft);
-		if (distanceLeft < WALL_SAFETY_MARGIN) {
-			float sideDifference = WALL_SAFETY_MARGIN - distanceLeft;
+		if (distanceLeft < avoidMargin) {
+			float sideDifference = avoidMargin - distanceLeft;
 			sideDirection = Right;
-			sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / WALL_SAFETY_MARGIN));
+			sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / avoidMargin));
 			delay(10);			
 		}
 		else{
 			float distanceRight = readDistanceSonar(sonarPinRight);
-			if (distanceRight < WALL_SAFETY_MARGIN){
-				float sideDifference = WALL_SAFETY_MARGIN - distanceRight;
+			if (distanceRight < avoidMargin){
+				float sideDifference = avoidMargin - distanceRight;
 				sideDirection = Left;
-				sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / WALL_SAFETY_MARGIN));
+				sideSpeed = (int)ABS(SIDE_CORRECTION_FACTOR * speed * (sideDifference / avoidMargin));
 				delay(10);
 			}
 		}

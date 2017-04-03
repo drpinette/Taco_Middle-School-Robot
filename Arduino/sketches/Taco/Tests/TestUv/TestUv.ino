@@ -14,7 +14,7 @@ void setup() {
 int maxDelay = 0;
 
 void loop() {
-    int val = RC->readUv(EAST_UV);
+    int val = RC->readUv(NORTH_UV);
     Serial.println(val);
     if (val > maxDelay) maxDelay = val;
     if (val > 0) {
