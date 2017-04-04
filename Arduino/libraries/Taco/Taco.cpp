@@ -64,6 +64,27 @@ void RobotController::rotate(int speed, Rotation turnDirection, Condition* stopC
 	
 }
 
+void RobotController::align(Side wallSide, Heading heading, Condition* stopCondition)
+{
+	int sonarOffset = (int)heading - (int)North;
+    int wallOffset = wallSide == Left ? 4: 0;
+    int sonarPinCCW = MOD(2+wallOffset + 2*sonarOffset, 8) + SONAR_ORIGIN;
+    int sonarPinCW = MOD(3+wallOffset + 2*sonarOffset, 8) + SONAR_ORIGIN;
+	
+  while(stopCondition != NULL && !stopCondition->test())
+  {
+	float distanceCCW = readDistanceSonar(sonarPinCCW);
+	delay(10);  //added delay to prevent signal interference
+	float distanceCW = readDistanceSonar(sonarPinCW);
+	delay(10);  //added delay to prevent signal interference
+	float angleDifference = distanceCCW - distanceCW;
+	Rotation turnDirection = (Rotation)SGN(angleDifference);
+	int turnSpeed = (int)ABS((255 * angleDifference/100) + 100);
+	go(North, 0, NoSide, 0, turnDirection, turnSpeed);
+  }
+	
+}
+
 void RobotController::stop()
 {
   for (int i = 0; i < NUM_MOTOR; i++) motorArray[i].run(BRAKE, 0);
@@ -139,6 +160,40 @@ void RobotController::followWall(Side wallSide, Heading heading, int speed, Cond
  if (stopCondition != NULL) delete stopCondition;
 }
 
+void RobotController::followUv(int speed, Condition* stopCondition)
+{
+  while(stopCondition != NULL && !stopCondition->test())
+  {
+	float leftUvSensor = readUv(LEFT_UV);
+    float centerUVSensor = readUv(CENTER_UV);
+    float rightUvSensor = readUv(RIGHT_UV);
+		
+	int turnSpeed = (int)ABS(TURN_CORRECTION_FACTOR * speed);
+	float uvDifference = rightUvSensor - leftUvSensor;
+	
+	if (leftUvSensor < centerUVSensor && rightUvSensor < centerUVSensor)
+	{
+		//Go Forward
+		go(North, speed, NoSide, 0, NoRotation, 0);
+	}
+	else
+	{
+	    if(leftUvSensor > centerUVSensor)
+		{
+			//Move to left
+			int turnSpeed = (int)ABS((leftUvSensor/1024 - centerUVSensor/1024) * speed);
+			go(North, speed, NoSide, 0, CCW, turnSpeed);
+		}
+		else
+		{
+			//Move to Right
+			int turnSpeed = (int)ABS((rightUvSensor/1024 - centerUVSensor/1024) * speed);
+			go(North, speed, NoSide, 0, CW, turnSpeed);
+		}	
+	}				
+  }
+  if (stopCondition != NULL) delete stopCondition;
+}
 int RobotController::sonarIdAt(Heading heading, Side side, Rotation direction)
 {
   int sonarOffset = MOD((((int)heading - (int)North) + (int)side) * 2 + (direction == CCW ? 0 : 1), NUM_SONAR);

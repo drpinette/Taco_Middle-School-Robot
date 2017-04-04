@@ -47,10 +47,13 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 #define SONAR_ORIGIN 2
 
 // Analog I/O pin assignments
-#define NORTH_UV 0
-#define EAST_UV 1
+//#define NORTH_UV 0
+#define CENTER_UV 0
+//#define EAST_UV 1
+#define RIGHT_UV 1
 #define SOUTH_UV 2
-#define WEST_UV 3
+//#define WEST_UV 3
+#define LEFT_UV 3
 #define UNASSIGNED1 4
 #define UNASSIGNED2 5
 
@@ -94,10 +97,12 @@ public:
   int readUv(int sensorId);
   float readDistanceSonar(int sensorId);
   void followWall(Side wallSide, Heading heading, int speed, Condition* stopCondition);
+  void followUv(int speed, Condition* stopCondition);
   void move(Heading heading, int speed, Condition* stopCondition);
   int sonarIdAt(Heading heading, Side side, Rotation direction);
   int uvIdAt(Heading heading);
   void rotate(int speed, Rotation turnDirection, Condition* stopCondition);
+  void align(Side wallSide, Heading heading, Condition* stopCondition);
   void extinguish(bool on);
 
 private:
