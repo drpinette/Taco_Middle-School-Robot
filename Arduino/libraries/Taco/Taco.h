@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <Adafruit_MotorShield.h>
 #include <Wire.h>
+#include <Enums.h>
 #include <Sensor.h>
 #include <Motor.h>
 #include <Condition.h>
@@ -11,10 +12,6 @@
 
 //#define DEBUG
 //#undef DEBUG
-
-enum Rotation { NoRotation = 0, CW  = 1 /*Clockwise*/, CCW = -1 /*Counterclockwise*/ };
-enum Heading { North = 0, East = 1, South = 2, West = 3 };
-enum Side { NoSide = 0, Right = 1, Left = -1 };
 
 #ifdef DEBUG
 #define _D(X) Serial.print(#X " "), Serial.print(X), Serial.print("; ") 
@@ -79,6 +76,7 @@ enum Side { NoSide = 0, Right = 1, Left = -1 };
 #define DEFAULT_SPEED (MAX_SPEED)
 #define WALL_SAFETY_MARGIN 3.0
 #define ANGLE_SAFETY_MARGIN 1.0
+#define SONAR_REFRACTORY_PERIOD 3000
 
 #define ABS(x) ((x)<0 ? -(x) : (x))
 #define SGN(x) ((x)<0 ? -1 : ((x)>0 ? 1 : 0))
@@ -93,11 +91,11 @@ public:
   void stop();
   int readUv(int sensorId);
   float readDistanceSonar(int sensorId);
-  void followWall(Side wallSide, Heading heading, int speed, Condition* stopCondition);
+  void followWall(Side wallSide, Heading heading, int speed, Condition* stopCondition, Rotation ignoreSonarAt=NoRotation);
   void move(Heading heading, int speed, Condition* stopCondition);
   int sonarIdAt(Heading heading, Side side, Rotation direction);
   int uvIdAt(Heading heading);
-  void rotate(int speed, Rotation turnDirection, Condition* stopCondition);
+  Heading rotate(int speed, Rotation turnDirection, Condition* stopCondition);
   void extinguish(bool on);
 
 private:

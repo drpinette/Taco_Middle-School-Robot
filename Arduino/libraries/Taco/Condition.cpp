@@ -4,7 +4,6 @@
 
 bool Condition::Compare(float value1, Comparison comparison, float value2)
 {
-	//_D(value1); _D(comparison); _D(value2); _NL;
   switch (comparison) {
   case Same: return value1 == value2;
   case Different: return value1 != value2;
@@ -79,4 +78,21 @@ bool True::test()
 bool False::test()
 {
   return false;
+}
+
+MovedBy::MovedBy(float distanceToMove, Heading heading, RobotController* robotController)
+{
+  this->distanceToMove = distanceToMove;
+  this->heading = heading;
+  initialDistance = 0;
+}
+
+bool MovedBy:: test()
+{
+  if (initialDistance = 0)
+  {
+    initialDistance = robotController->readDistanceSonar(robotController->sonarIdAt(heading, NoSide, CW));
+    return false;
+  }
+  else return robotController->readDistanceSonar(robotController->sonarIdAt(heading, NoSide, CW)) > (initialDistance + distanceToMove);
 }

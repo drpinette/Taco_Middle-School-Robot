@@ -1,6 +1,7 @@
 #ifndef CONDITION_H
 #define CONDITION_H
 /////////////////////////////////////////////////////////////////////////////
+#include <Enums.h>
 
 class RobotController;
 
@@ -59,5 +60,19 @@ class False : public Condition
 public:
   bool test();
 };
+
+class MovedBy : public Condition
+{
+public:
+  MovedBy(float distanceToMove, Heading heading, RobotController* robotController);
+  bool test();
+private:
+  float initialDistance;
+  float distanceToMove;
+  Heading heading;
+  RobotController* robotController;
+
+};
+
 /////////////////////////////////////////////////////////////////////////////
 #endif
